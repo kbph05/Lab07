@@ -1,0 +1,29 @@
+Library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity PreScale is
+	generic (DataWidth: integer :=25 ---- generic parameter for counters datawidth
+	);
+port (InClock  : in std_logic;
+		OutClock : out std_logic
+		);
+end PreScale;
+
+architecture func of PreScale is
+
+signal counter: unsigned (DataWidth-1 downto 0); --- 25 bit counter
+
+begin
+
+process (counter, InClock)
+begin
+
+	if rising_edge(InClock) ---- checking for rising edge
+		then counter <= counter +1;----- adding 1 to counter
+	end if;
+end process;
+
+OutClock <= Counter(DataWidth - 1);--- connecting MSB to the output
+
+end func;
