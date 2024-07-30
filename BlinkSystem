@@ -1,0 +1,66 @@
+Library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity BlinkSystem is
+Port (Clock: in  std_logic;
+		Enable: in  std_logic;
+		seg3: out std_logic_vector(6 downto 0);
+		seg2: out std_logic_vector(6 downto 0);
+		seg1: out std_logic_vector(6 downto 0);
+		seg0: out std_logic_vector(6 downto 0);
+		green: out std_logic_vector(7 downto 0);
+		red: out std_logic_vector(17 downto 0)  
+);
+end BlinkSystem;
+
+architecture func of BlinkSystem is
+
+signal blink_state : std_logic := '0';
+
+component Prescale is
+port (InClock: in std_logic;
+		outClock: out std_logic
+);
+end component;
+
+begin
+
+process(clock, ENABLE)
+
+	BEGIN
+	IF (ENABLE ='1') THEN
+		IF (BLINK_STATE ='1') THEN
+			SEG0 <= "0001001";
+			SEG1 <= "0000110";
+			SEG2 <= "1000111";
+			SEG3 <= "0001100";
+			GREEN <= (OTHERS => '1');
+			RED <= (OTHERS => '1');
+		ELSE
+			SEG0 <= "1111111";
+			sEG1 <= "1111111";
+			SEG2 <= "1111111";
+			SEG3 <= "1111111";
+			gREEN <= (OTHERS => '0');
+			RED <= (OTHERS => '0');
+		END IF;
+		
+	ELSE
+		SEG0 <= "1111111";
+		SEG1 <= "1111111";
+		SEG2 <= "1111111";
+		SEG3 <= "1111111";
+		GREEN <= (OTHERS => '0');
+		RED <= (OTHERS => '0');
+	END IF;
+END PROCESS;
+
+	U1: PRESCALE
+	PORT MAP (
+		INCLOCK => CLOCK,
+		OUTCLOCK => BLINK_STATE
+	);
+	
+	
+END FUNC;
