@@ -1,0 +1,87 @@
+Library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+
+entity AlarmSystem is
+Port (CLOCK_50: in std_logic;
+		SW: in  std_logic_vector(17 downto 0);
+		KEY: in  std_logic_vector(0 downto 0);
+		LEDR: out std_logic_vector(17 downto 0);
+		LEDG: out std_logic_vector(7 downto 0);
+		HEX7: out std_logic_vector(6 downto 0);
+		HEX6: out std_logic_vector(6 downto 0);
+		HEX5: out std_logic_vector(6 downto 0);
+		HEX4: out std_logic_vector(6 downto 0);
+		HEX2: out std_logic_vector(6 downto 0);
+		HEX1: out std_logic_vector(6 downto 0);
+		HEX0: out std_logic_vector(6 downto 0)
+);
+end AlarmSystem;
+
+architecture func of AlarmSystem is
+
+	signal disarm : std_logic;
+	signal trigger : std_logic; -- := '0';
+
+	COMPONENT BlinkSystem IS
+	Port (Clock:in  std_logic;
+			Enable: in  std_logic;
+			seg3: out std_logic_vector(6 downto 0);
+			seg2: out std_logic_vector(6 downto 0);
+			seg1: out std_logic_vector(6 downto 0);
+			seg0: out std_logic_vector(6 downto 0);
+			green: out std_logic_vector(7 downto 0);
+			red: out std_logic_vector(17 downto 0));
+end component;
+
+component DisarmSystem is
+Port (clock: in  std_logic;
+		w: in  std_logic_vector(1 downto 0);  -- 2-bit input
+		sseg2: out std_logic_vector(6 downto 0);  -- 7-segment display outputs
+		sseg1: out std_logic_vector(6 downto 0);
+		sseg0: out std_logic_vector(6 downto 0);
+		disarm: out std_logic                       -- Disarm output
+);
+end component;
+begin
+-- Instantiate DisarmSystem
+
+	U1 : DisarmSystem
+	port map (
+		clock => KEY(0),
+		w => SW(2 downto 1),
+		sseg2 => HEX0,
+		sseg1 => HEX1,
+		sseg0 => HEX2,
+		disarm => disarm
+	);
+
+   -- Instantiate BlinkSystem
+	U2 : BlinkSystem
+	port map (
+		Clock => CLOCK_50,
+		Enable => trigger,
+		seg3 => HEx4,
+		seg2 => HEX5,
+		seg1 => HEX6,
+		seg0 => HEX7,
+		green => LEDG,
+		red => LEDR
+	);
+process(CLOCK_50)
+	begin
+	if rising_edge (clock_50) then
+		if (disarm ='1') then
+			trigger <= '0';
+		elsif ((SW(0) = '1') and (SW(17) = '1' or SW(16) = '1' or SW(15) = '1')) then -- Alarm system is active
+			trigger <= '1'; -- Trigger the alarm
+		else
+			trigger <= trigger; -- Do not trigger the alarm
+		end if;
+	else
+		trigger <= trigger; -- Alarm system is off
+	end if;
+end process;
+
+end func;
