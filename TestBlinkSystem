@@ -1,0 +1,47 @@
+Library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity TestBlinkSystem is
+Port (SW: in  std_logic_vector(3 downto 0);  
+		CLOCK_50 : in  std_logic;                     -- 50 MHz clock input
+		HEX7 : out std_logic_vector(6 downto 0);
+		HEX6: out std_logic_vector(6 downto 0);
+		HEX5: out std_logic_vector(6 downto 0);
+		HEX4: out std_logic_vector(6 downto 0);
+		LEDG: out std_logic_vector(7 downto 0);  
+		LEDR: out std_logic_vector(17 downto 0)  
+);
+end TestBlinkSystem;
+
+
+architecture FUNC of TestBlinkSystem IS
+
+SIGNAL CLOCK_SIG: STD_LOGIC;
+
+COMPONENT BlinkSystem IS
+Port (Clock : in  std_logic;
+		Enable : in  std_logic;
+		seg3 : out std_logic_vector(6 downto 0);
+		seg2 : out std_logic_vector(6 downto 0);
+		seg1 : out std_logic_vector(6 downto 0);
+		seg0 : out std_logic_vector(6 downto 0);
+		green : out std_logic_vector(7 downto 0);
+		red : out std_logic_vector(17 downto 0)
+);
+end component;
+
+BEGIN
+
+U2: BlinkSystem
+PORT MAP(
+		CLOCK => CLOCK_50,
+		ENABLE => SW(0),
+		seg0 => HEX7,
+		seg1 => HEX6,
+		seg2 => HEX5,
+		seg3 => HEX4,
+		green => LEDG,
+		red => LEDR
+);
+END FUNC; 
